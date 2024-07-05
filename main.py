@@ -41,7 +41,7 @@ titulo_tarefa = Label(tarefa1, text="Título da tarefa aqui.",font=("Ivy 14 bold
 data_tarefa = Label(tarefa1, text="Prazo: 28/09/2024",font=("Ivy 10 bold"),bg=azul)
 titulo_tarefa.place(relx=0.5, rely=0.3, anchor=CENTER)
 data_tarefa.place(relx=0.5, rely=0.9, anchor=CENTER)
-detalhes_tarefa = Button(tarefa1, text="Ver detalhes",font=("Verdana",11),bg=branco)
+detalhes_tarefa = Button(tarefa1, command=lambda:ver_detalhes(janela), text="Ver detalhes",font=("Verdana",11),bg=branco)
 detalhes_tarefa.place(relx=0.5,rely=0.7,anchor=CENTER)
 
 

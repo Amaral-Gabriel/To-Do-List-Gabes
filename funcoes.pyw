@@ -47,14 +47,13 @@ def abrir_nova_tarefa(janela):
 
 def salvar_dados(janela):
     
-    # Consertar descrição que nao esta funcionando
     titulo = entrada_titulo.get()
-    descricao = entrada_descricao.get()
+    descricao = entrada_descricao.get("1.0", tk.END)
     prazo = entrada_prazo.get()
     box = var1.get()
     #tarefa = {"title":titulo, "descricao":descricao, "prazo":prazo, "CheckBox":box}
     #print(tarefa)
-    print(descricao)
+    print(box)
     
     formulario.destroy()
     

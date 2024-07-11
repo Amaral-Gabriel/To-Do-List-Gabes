@@ -4,6 +4,9 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 from funcoes import *
 
+global tarefas
+global janela
+
 cinza = '#C0C0C0'
 azul = '#87CEFA'
 verde = '#008000'
@@ -35,14 +38,6 @@ tarefas.grid(row=3,column=0)
 
 #Criar barra de rolagem
 
-tarefa1 = Frame(tarefas, width=200,height=200,bg=azul)
-tarefa1.grid(row=0,column=0,padx=10, pady=10)
-titulo_tarefa = Label(tarefa1, text="Título da tarefa aqui.",font=("Ivy 14 bold"),bg=azul)
-data_tarefa = Label(tarefa1, text="Prazo: 28/09/2024",font=("Ivy 10 bold"),bg=azul)
-titulo_tarefa.place(relx=0.5, rely=0.3, anchor=CENTER)
-data_tarefa.place(relx=0.5, rely=0.9, anchor=CENTER)
-detalhes_tarefa = Button(tarefa1, command=lambda:ver_detalhes(janela), text="Ver detalhes",font=("Verdana",11),bg=branco)
-detalhes_tarefa.place(relx=0.5,rely=0.7,anchor=CENTER)
 
 
 janela.mainloop()

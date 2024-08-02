@@ -36,12 +36,12 @@ def abrir_nova_tarefa(janela): # Abre a nova aba que será responsável por faze
 
     # Recebe o título
     tk.Label(formulario, text="Título da Tarefa:").grid(row=0, column=0, padx=10, pady=10)
-    entrada_titulo = tk.Entry(formulario,width=30,textvariable=titulo_var)
+    entrada_titulo = tk.Entry(formulario,width=30,textvariable=titulo_var,font=("Verdana",10))
     entrada_titulo.grid(row=0, column=1, padx=10, pady=10,sticky=NW)
 
     # Recebe a descrição
     tk.Label(formulario, text="Descrição:").grid(row=1, column=0, padx=10, pady=10)
-    entrada_descricao = tk.Text(formulario, width=30, height=5)
+    entrada_descricao = tk.Text(formulario, width=30, height=5,font=("Verdana",10))
     entrada_descricao.grid(row=1, column=1, padx=10, pady=10,sticky=NW)
 
     # Recebe o prazo
@@ -101,12 +101,12 @@ def ver_detalhes(janela): # Abre a janela que permite o usuario vizualizar todos
     detalhe.grid_columnconfigure(0,weight=1)
 
     # Frame do título
-    titulo_detalhe = Label(detalhe,text=titulo,bg=azul,font=("Ivy 10 bold"),anchor=CENTER)
-    titulo_detalhe.grid(row=0,column=0,columnspan=2, padx=10, pady=10)
+    titulo_detalhe = Label(detalhe,text=titulo,bg=cinza_claro,font=("Ivy 10 bold"),anchor=CENTER)
+    titulo_detalhe.grid(row=0,column=0,columnspan=3, padx=10, pady=10)
 
     # Frame da descrição
     frame_descricao = Frame(detalhe,bg=azul)
-    frame_descricao.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky=W)
+    frame_descricao.grid(row=1, column=0, columnspan=3, padx=10, pady=10, sticky=W)
 
     # Cria o scrollbar para o frame da descrição
     scrollbar = Scrollbar(frame_descricao)
@@ -114,7 +114,7 @@ def ver_detalhes(janela): # Abre a janela que permite o usuario vizualizar todos
 
     ### Configurar se o scrollbar deve aparecer dependendo da quantidade de letras
 
-    descricao_detalhe = Text(frame_descricao, height=10, bg=azul, font=("Ivy 10 bold"), wrap=tk.WORD, yscrollcommand=scrollbar.set)
+    descricao_detalhe = Text(frame_descricao, height=10, bg=branco, font=("Ivy 10 bold"), wrap=tk.WORD, yscrollcommand=scrollbar.set)
     descricao_detalhe.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
     descricao_detalhe.insert(END, descricao)
     descricao_detalhe.config(state=tk.DISABLED)
@@ -122,25 +122,38 @@ def ver_detalhes(janela): # Abre a janela que permite o usuario vizualizar todos
     scrollbar.config(command=descricao_detalhe.yview)
 
     # Frame prazo
-    prazo_detalhe = Label(detalhe,text="Prazo: "+prazo,bg=azul,font=("Ivy 10 bold"),anchor=CENTER)
-    prazo_detalhe.grid(row=2,column=0,columnspan=2, padx=10, pady=10)
+    prazo_detalhe = Label(detalhe,text="Prazo: "+prazo,bg=cinza_claro,font=("Ivy 10 bold"),anchor=CENTER)
+    prazo_detalhe.grid(row=2,column=0,columnspan=3, padx=10, pady=10)
 
     # Verifica se a tarefa está concluida ou pendente
     if box == True:
-        feito_detalhe = Label(detalhe,text="Concluido",bg=azul,font=("Ivy 10 bold"),anchor=CENTER)
-        feito_detalhe.grid(row=3,column=0,columnspan=2, padx=10, pady=10)
+        feito_detalhe = Label(detalhe,text="Concluido",bg=cinza_claro,font=("Ivy 10 bold"),anchor=CENTER)
+        feito_detalhe.grid(row=3,column=0,columnspan=3, padx=10, pady=10)
     else:
-        feito_detalhe = Label(detalhe,text="Pendente",bg=azul,font=("Ivy 10 bold"),anchor=CENTER)
-        feito_detalhe.grid(row=3,column=0,columnspan=2, padx=10, pady=10)
+        feito_detalhe = Label(detalhe,text="Pendente",bg=cinza_claro,font=("Ivy 10 bold"),anchor=CENTER)
+        feito_detalhe.grid(row=3,column=0,columnspan=3, padx=10, pady=10)
 
     # Botão editar
     editar = Button(detalhe, text="Editar",font=("Verdana",11),bg='#FFFAFA')
-    editar.grid(row=4,column=1, padx=10, pady=10)
+    editar.grid(row=4,column=2, padx=10, pady=10)
 
     ### Criar função de editar tarefa
-    ### Cria função para alterar o concluido ou pendente
+
+    # Cria botao para alterar o concluido
+    def concluir(detalhe):
+        global box
+        feito_detalhe.config(text="Concluido")
+        editar.destroy()
+        box = True
+        tarefa = {"title":titulo, "descricao":descricao, "prazo":prazo, "CheckBox":box}
+    
+    if not box:
+        editar = Button(detalhe,command=lambda:concluir(detalhe), text="Concluir",font=("Verdana",11),bg='#FFFAFA')
+        editar.grid(row=4, column=1, padx=10, pady=10)
 
     # Botão fechar
-    fechar = Button(detalhe, command=detalhe.destroy, text="Cancelar",font=("Verdana",11),bg='#FFFAFA')
+    fechar = Button(detalhe, command=detalhe.destroy, text="Voltar",font=("Verdana",11),bg='#FFFAFA')
     fechar.grid(row=4,column=0, padx=10, pady=10,sticky=W)
+
+
 

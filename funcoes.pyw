@@ -55,8 +55,6 @@ def abrir_nova_tarefa(janela): # Abre a nova aba que será responsável por faze
     marcar_feito = tk.Checkbutton(formulario,variable=var1)
     marcar_feito.grid(row=3,column=1, padx=10, pady=10,sticky=NW)
 
-    ### Adicionar tela de erro caso o titulo esteja vazio
-
     # Botão salvar
     salvar = Button(formulario, command=lambda:salvar_dados(janela), text="Salvar",font=("Verdana",11),bg='#FFFAFA',width=20)
     salvar.grid(row=4,column=1, padx=10, pady=10,sticky=SE)
@@ -72,17 +70,27 @@ def salvar_dados(janela): # Coleta os dados da 'função abrir_nova_tarefa()', e
     global descricao
     global box
 
-    titulo = titulo_var.get()
-    descricao = entrada_descricao.get("1.0", tk.END)
-    prazo = entrada_prazo.get()
-    box = var1.get()
-    tarefa = {"title":titulo, "descricao":descricao, "prazo":prazo, "CheckBox":box}
-    
-    # Adiciona a tarefa
-    adicionar_tarefa(janela)
+    # Adicionar tela de erro caso o titulo esteja vazio
+    if not titulo_var.get().strip():
+        erro = tk.Toplevel(janela)
+        erro.title("Erro")
+        erro.geometry('300x200')
+        erro_label = tk.Label(erro, text="O título não pode estar vazio!", font=("Verdana", 10), fg="red")
+        erro_label.pack(pady=20)
+        erro_button = tk.Button(erro, text="Fechar", command=erro.destroy)
+        erro_button.pack(pady=10)
+    else:
+        titulo = titulo_var.get()
+        descricao = entrada_descricao.get("1.0", tk.END)
+        prazo = entrada_prazo.get()
+        box = var1.get()
+        tarefa = {"title":titulo, "descricao":descricao, "prazo":prazo, "CheckBox":box}
+        
+        # Adiciona a tarefa
+        adicionar_tarefa(janela)
 
-    # Fecha a janela
-    formulario.destroy()
+        # Fecha a janela
+        formulario.destroy()
 
 def adicionar_tarefa(janela): # Função responsável por adicionar frames contendo os dados das tarefas e mostrar no frame 'tarefas'
 

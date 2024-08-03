@@ -55,6 +55,8 @@ def abrir_nova_tarefa(janela): # Abre a nova aba que será responsável por faze
     marcar_feito = tk.Checkbutton(formulario,variable=var1)
     marcar_feito.grid(row=3,column=1, padx=10, pady=10,sticky=NW)
 
+    ### Adicionar tela de erro caso o titulo esteja vazio
+
     # Botão salvar
     salvar = Button(formulario, command=lambda:salvar_dados(janela), text="Salvar",font=("Verdana",11),bg='#FFFAFA',width=20)
     salvar.grid(row=4,column=1, padx=10, pady=10,sticky=SE)
@@ -95,6 +97,9 @@ def adicionar_tarefa(janela): # Função responsável por adicionar frames conte
     detalhes_tarefa.place(relx=0.5,rely=0.7,anchor=CENTER)
     
 def ver_detalhes(janela): # Abre a janela que permite o usuario vizualizar todos os dados da tarefa
+    global feito_detalhe
+    global editar
+    global detalhe
     detalhe = tk.Toplevel(janela)
     detalhe.title("Detalhes da tarefa")
     detalhe.geometry('400x400')
@@ -134,19 +139,72 @@ def ver_detalhes(janela): # Abre a janela que permite o usuario vizualizar todos
         feito_detalhe.grid(row=3,column=0,columnspan=3, padx=10, pady=10)
 
     # Botão editar
-    editar = Button(detalhe, text="Editar",font=("Verdana",11),bg='#FFFAFA')
+    editar = Button(detalhe, command=lambda:editar_tarefa(janela), text="Editar",font=("Verdana",11),bg='#FFFAFA')
     editar.grid(row=4,column=2, padx=10, pady=10)
 
     ### Criar função de editar tarefa
+    def editar_tarefa(janela): # Abre a nova aba que será responsável por fazer o input dos dados
+        global entrada_titulo
+        global entrada_descricao
+        global entrada_prazo
+        global marcar_feito
+        global formulario
+        global var1
+        global titulo_var
 
-    # Cria botao para alterar o concluido
-    def concluir(detalhe):
-        global box
-        feito_detalhe.config(text="Concluido")
-        editar.destroy()
-        box = True
-        tarefa = {"title":titulo, "descricao":descricao, "prazo":prazo, "CheckBox":box}
-    
+        # Define algumas variaveis que serão usadas depois
+        var1 = BooleanVar()
+        titulo_var = StringVar()
+
+        # Janela que recebe os dados
+        formulario = tk.Toplevel(detalhe)
+        formulario.title("Editar tarefa")
+        formulario.geometry('400x300')
+
+        # Recebe o título
+        tk.Label(formulario, text="Título da Tarefa:").grid(row=0, column=0, padx=10, pady=10)
+        entrada_titulo = tk.Entry(formulario,width=30,textvariable=titulo_var,font=("Verdana",10))
+        entrada_titulo.grid(row=0, column=1, padx=10, pady=10,sticky=NW)
+        entrada_titulo.insert(0,titulo)
+
+        # Recebe a descrição
+        tk.Label(formulario, text="Descrição:").grid(row=1, column=0, padx=10, pady=10)
+        entrada_descricao = tk.Text(formulario, width=30, height=5,font=("Verdana",10))
+        entrada_descricao.grid(row=1, column=1, padx=10, pady=10,sticky=NW)
+        entrada_descricao.insert("1.0",descricao)
+
+        # Recebe o prazo
+        tk.Label(formulario, text="Prazo:").grid(row=2, column=0, padx=10, pady=10)
+        entrada_prazo = DateEntry(formulario,selectmode="day",date_pattern='dd/MM/yyyy')
+        entrada_prazo.grid(row=2, column=1, padx=10, pady=10,sticky=NW)
+        ### Colocar horas no prazo
+
+        # Checa se será marcado como concluído
+        tk.Label(formulario, text="Marcar como feito?").grid(row=3, column=0, padx=10, pady=10)
+        if box:
+            var1 = tk.IntVar(value=1)
+        else:
+            var1 = tk.IntVar(value=0)
+        marcar_feito = tk.Checkbutton(formulario,variable=var1)
+        marcar_feito.grid(row=3,column=1, padx=10, pady=10,sticky=NW)
+
+        # Botão salvar
+        salvar = Button(formulario, command=lambda:salvar_e_fechar(janela), text="Salvar",font=("Verdana",11),bg='#FFFAFA',width=20)
+        salvar.grid(row=4,column=1, padx=10, pady=10,sticky=SE)
+
+        # Botão fechar
+        fechar = Button(formulario, command=lambda:fechar_janela(detalhe), text="Cancelar",font=("Verdana",11),bg='#FFFAFA')
+        fechar.grid(row=4,column=0, padx=10, pady=10, sticky=S)
+
+    def salvar_e_fechar(detalhe):
+        salvar_dados(janela)
+        fechar_janela(janela)
+
+    # Fecha a janela de detalhes e editar
+    def fechar_janela(janela):
+        formulario.destroy()
+        detalhe.destroy()
+
     if not box:
         editar = Button(detalhe,command=lambda:concluir(detalhe), text="Concluir",font=("Verdana",11),bg='#FFFAFA')
         editar.grid(row=4, column=1, padx=10, pady=10)
@@ -156,4 +214,15 @@ def ver_detalhes(janela): # Abre a janela que permite o usuario vizualizar todos
     fechar.grid(row=4,column=0, padx=10, pady=10,sticky=W)
 
 
+# Cria botao para alterar o concluido
+def concluir(detalhe):
+    global box
+    feito_detalhe.config(text="Concluido")
+    editar.destroy()
+    box = True
+    tarefa = {"title":titulo, "descricao":descricao, "prazo":prazo, "CheckBox":box}
 
+# Fecha a janela de detalhes e editar
+def fechar_janela(janela):
+    formulario.destroy()
+    detalhe.destroy()

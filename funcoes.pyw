@@ -3,7 +3,8 @@ from tkinter import *
 from tkinter import ttk
 from PIL import Image, ImageTk
 from tkcalendar import DateEntry
-import main
+#import main
+import json
 
 # Definição de cores
 cinza = '#C0C0C0'
@@ -15,6 +16,42 @@ cinza_escuro = "#808080" # Usado para texto ou bordas
 azul_claro = "#87CEFA" # Usado para elementos principais
 azul_escuro = "#4682B4" # Usado para texto ou elementos de destaque
 branco = "#FFFFFF" # Usado para fundos ou texto
+
+global tarefas
+global janela
+
+# Janela principal
+janela = Tk()
+janela.title('To-Do List')
+janela.geometry('800x600')
+janela.configure(bg=branco)
+janela.resizable(width=False,height=False) # Não permite o ajuste do tamanho da janela
+
+# Título do programa
+frame_titulo = Frame(janela, width=800, height=70, bg=azul,relief='raised')
+frame_titulo.grid(row=0,column=0,sticky=NW)
+frame_adicionar = Frame(janela, width=800, height=50, bg=cinza,relief='raised')
+frame_adicionar.grid(row=1,column=0,sticky=NW)
+
+titulo = Label(frame_titulo, text="TO-DO LIST",font=("Ivy 30 bold"),fg=branco,bg=azul)
+titulo.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+# Navbar com o botão adicionar
+adicionar = Button(frame_adicionar,command =lambda: abrir_nova_tarefa(janela), text="+ Adicionar nova tarefa",font=("Verdana",13),fg=branco,bg=cinza)
+adicionar.place(relx=0.5,rely=0.5,anchor=CENTER)
+
+# Gera um espaço entres os frames
+espaco = Frame(janela, width=780,height=10,bg=branco)
+espaco.grid(row=2,column=0)
+
+# Frame reservado para mostrar as tarefas
+tarefas_frame = Frame(janela, width=800,height=600,bg=branco)
+tarefas_frame.grid(row=3,column=0)
+
+###############################################################################################
+
+tarefas =[]
+tarefa_cont = 0
 
 def abrir_nova_tarefa(janela): # Abre a nova aba que será responsável por fazer o input dos dados
     global entrada_titulo
@@ -88,23 +125,51 @@ def salvar_dados(janela): # Coleta os dados da 'função abrir_nova_tarefa()', e
         
         # Adiciona a tarefa
         adicionar_tarefa(janela)
+        tarefas.append(tarefa)
+        salvar_tarefas()
+        adicionar_tarefa(tarefa)
 
         # Fecha a janela
         formulario.destroy()
 
-def adicionar_tarefa(janela): # Função responsável por adicionar frames contendo os dados das tarefas e mostrar no frame 'tarefas'
+def salvar_tarefas():
+    with open('tarefas.json', 'w') as f:
+        json.dump(tarefas, f, indent=4)
+    
+
+
+def carregar_tarefas():
+    global tarefas
+    try:
+        with open('tarefas.json', 'r') as f:
+            tarefas = json.load(f)
+            for tarefa in tarefas:
+                adicionar_tarefa(tarefa)
+    except FileNotFoundError:
+        tarefas = []
+
+
+def adicionar_tarefa(tarefa): # Função responsável por adicionar frames contendo os dados das tarefas e mostrar no frame 'tarefas'
+    global tarefa_cont
+    tarefa_cont += 1
+
+    row = tarefa_cont // 4
+    column = tarefa_cont % 4
 
     ### Criar o sistema que irá permitir a criação de várias tarefas
-    tarefa = Frame(janela, width=200,height=200,bg=azul)
-    tarefa.grid(row=3,column=0,padx=10, pady=10)
-    titulo_tarefa = Label(tarefa, text=titulo[:16],font=("Ivy 14 bold"),bg=azul)
-    data_tarefa = Label(tarefa, text=prazo,font=("Ivy 10 bold"),bg=azul)
+    frame_tarefa = Frame(tarefas_frame, width=180,height=200,bg=azul)
+    frame_tarefa.grid(row=row,column=column,padx=10, pady=10)
+    titulo_tarefa = Label(frame_tarefa, text=titulo[:15],font=("Ivy 14 bold"),bg=azul)
+    data_tarefa = Label(frame_tarefa, text=prazo,font=("Ivy 10 bold"),bg=azul)
     titulo_tarefa.place(relx=0.5, rely=0.3, anchor=CENTER)
     data_tarefa.place(relx=0.5, rely=0.9, anchor=CENTER)
-    detalhes_tarefa = Button(tarefa, command=lambda:ver_detalhes(tarefa), text="Ver detalhes",font=("Verdana",11),bg=branco)
+    detalhes_tarefa = Button(frame_tarefa, command=lambda:ver_detalhes(tarefa), text="Ver detalhes",font=("Verdana",11),bg=branco)
     detalhes_tarefa.place(relx=0.5,rely=0.7,anchor=CENTER)
+    for i in range(3):
+        tarefas_frame.grid_columnconfigure(i, weight=1, minsize=200)
+    tarefas_frame.grid_rowconfigure(row, weight=1, minsize=200)
     
-def ver_detalhes(janela): # Abre a janela que permite o usuario vizualizar todos os dados da tarefa
+def ver_detalhes(tarefa): # Abre a janela que permite o usuario vizualizar todos os dados da tarefa
     global feito_detalhe
     global editar
     global detalhe
@@ -205,8 +270,18 @@ def ver_detalhes(janela): # Abre a janela que permite o usuario vizualizar todos
         fechar.grid(row=4,column=0, padx=10, pady=10, sticky=S)
 
     def salvar_e_fechar(detalhe):
-        salvar_dados(janela)
-        fechar_janela(janela)
+            # Adicionar tela de erro caso o titulo esteja vazio
+        if not titulo_var.get().strip():
+            erro = tk.Toplevel(janela)
+            erro.title("Erro")
+            erro.geometry('300x200')
+            erro_label = tk.Label(erro, text="O título não pode estar vazio!", font=("Verdana", 10), fg="red")
+            erro_label.pack(pady=20)
+            erro_button = tk.Button(erro, text="Fechar", command=erro.destroy)
+            erro_button.pack(pady=10)
+        else:
+            salvar_dados(janela)
+            fechar_janela(janela)
 
     # Fecha a janela de detalhes e editar
     def fechar_janela(janela):
@@ -230,7 +305,5 @@ def concluir(detalhe):
     box = True
     tarefa = {"title":titulo, "descricao":descricao, "prazo":prazo, "CheckBox":box}
 
-# Fecha a janela de detalhes e editar
-def fechar_janela(janela):
-    formulario.destroy()
-    detalhe.destroy()
+
+janela.mainloop()
